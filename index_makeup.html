@@ -1,0 +1,694 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<style>
+			/*ALL*/
+			body{
+			  font-family: Arial, sans-serif;
+			}
+			.multi-line{
+				white-space: pre-wrap;
+				width: 100%;
+			}
+			/*HEADER*/
+			#main-header{
+				margin-bottom: 25px;
+				background-color: pink;
+				padding: 10px;
+				border-radius: 10px;
+			}
+			.related_link{
+				margin-right: 25px;
+			}
+			
+			/*CART*/
+			#cart-btn{
+				background-color: lightgreen;
+			}
+			#cart-btn{
+				background-color: lightgreen;
+			}
+			.card-form-item{
+				display: block;
+			}
+			.result_subtotal:after{
+				content: attr(data-subtotal);
+			}
+			#cart-form-container tr:nth-child(odd) {
+				background-color: lightgray;
+			}
+			#cart-form-container tr td {
+				border-right: 3px solid lightcoral;
+			}
+			.card-form-row td:nth-last-child(-n+3), .result_row{
+				text-align: right;
+			}
+
+			/*TRANSACTION*/
+			.order_button{
+				position: relative;
+			}
+			.order_tooltiptext{
+				bottom: -28px;
+				visibility: hidden;
+				background-color: black;
+				color: #fff;
+				text-align: center;
+				padding: 5px;
+				border-radius: 6px;
+
+				/* Position the tooltip text - see examples below! */
+				position: absolute;
+				z-index: 1;
+			}
+			.order_tooltiptext.show {
+			  visibility: visible;
+			  animation: show-hide-anm 3s;
+			}
+			
+			/*DIALOG*/
+			#my-cart-dialog{
+				left: 10%;
+				width: 80%;
+			}
+			.my-dialog{
+				position: absolute;
+				left: 10%;
+				margin-right: 10%;
+				z-index: 1050;
+			}
+			.my-tab, .my-dialog{
+				border: none;
+				background-color: #ddd;
+				box-shadow: 3px 3px 4px black;
+			}
+			.my-dialog-btn{
+				padding: 2px 6px;
+				background-color: #fff;
+				border: none;
+				text-align: center;
+			}
+			.my-tab, .my-dialog, .my-dialog-btn{
+				padding: 2px 6px;
+			}
+			
+			/*TABS*/
+			.flex-container{
+				position: relative;
+				display: flex;
+				flex-wrap: wrap;
+				width: 100%;
+			}
+			.my-tab{
+				margin-right: 10px;
+				margin-bottom: 10px;
+				cursor: pointer;
+			}
+			.my-tab-desc{
+				margin-top: 1rem;
+				margin-left: 1rem;
+				width: 100%;
+			}
+			
+			/*CARDS*/
+			.card-container{
+				position: absolute;
+				top: 100%;
+				left: 2%;
+				width: 98%;
+				
+				display: flex;
+				flex-wrap: wrap;
+			}
+			.card{
+				background-color: lightpink;
+				padding: 1rem;
+				margin: 1rem;
+				width: 100%;
+				
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+			}
+			.card_title{
+				margin: 0;
+				height: 5em;
+				font-size: 12pt;
+				
+				width: 66%;
+				margin-right: 1%;
+			}
+			.card_visual{
+				height: 100px;
+				width: 33%;
+			}
+			.card_visual img, .my-dialog img{
+				width: 100%;
+				height: 100%;
+				object-fit: contain;
+			}
+			.card_detail > span{
+				display: block;
+			}
+			.item_quantity, .item_subtotal{
+				width: 45%;
+			}
+			.item_variant{
+				width: 90%;
+			}
+			.item_subtotal{
+				display: inline-block;
+				font-weight: bold;
+				font-style: italic;
+			}
+			.card_dialog_detail{
+				margin-top: -100px;
+			}
+			
+			/*BACKDROP*/
+			#backdrop{
+				position: fixed;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				z-index: 1040;
+				background-color: #000;
+				opacity: .5;
+				display: none;
+			}
+			.backdrop-show{
+				display: block!important;
+			}
+
+			@keyframes show-hide-anm { 
+				0% {opacity: 0;}
+				30% {opacity: 1;}
+				85% {opacity: 1;}
+				100% {opacity: 0;}
+			}
+			
+			@media only screen and (min-width: 768px) {
+				/* For web: */
+				.card{
+					width: 12rem;
+					display: flex;
+					flex-direction: column;
+				}
+				.card_title{
+					width: 100%;
+					/*
+					overflow: hidden;
+					white-space: nowrap;
+					text-overflow: ellipsis;*/
+				}
+				.card > div{
+					margin-top: 10px;
+					margin-bottom: 10px;
+				}
+				.card_visual{
+					height: 200px;
+					width: 100%;
+				}
+				.my-dialog{
+					left: 25%;
+					width: 50%;
+				}
+				.card-form-item{
+					display: table-cell;
+				}
+				.card_dialog_detail{
+					margin-top: -600px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div id="main-header">
+			<h2>
+				INDEXBRANCH MAKE UP & STUFF
+			</h2>
+			<p>
+				WORKING HOURS : 09:00~18:00
+			</p>
+			<p>
+				<strong class="blink_me">PERHATIAN !!</strong>
+			</p>
+			<p>
+				<strong>Pesanan jika lewat dari PESANAN TERAKHIR akan dianggap sebagai pesanan minggu berikutnya, kecuali telah menghubungi yang bertugas untuk dikonfirmasi terlebih dahulu.</strong>
+			</p>
+			<a class="btn btn-lg btn-info" href="https://docs.google.com/document/d/1Qzhd8HQOFs3wTW0D25hMfRlLEzDXT92a8XEZWAS2Pcg/edit" target="_blank">
+				SOP &amp; PERIHAL
+			</a>			
+			<details>
+				<summary>Link Lainnya</summary>
+				<div id="related_link">
+				</div>
+			</details>
+		</div>
+		<div id="main-body">
+			Loading...
+		</div>
+	</body>
+	<script type="module">
+		import {html, render} from 'https://unpkg.com/lit-html?module';
+		
+		const info_url = "https://script.google.com/macros/s/AKfycbxc5bR6dh2XRHBsjVF-8mnU62P2j3lLHH4WXnoF_0f7lhwf1nF83OJLzL-M-pq1dIIu8g/exec";
+		const submit_url = "https://script.google.com/macros/s/AKfycbwI0ZNX4sPPRYUQA2NgpdGxpv_dZgM3Wus5JE6-DKqaBsdiiD02B6d2JU4L9SyNzH5Vcg/exec";
+		//const submit_url = "https://script.google.com/macros/s/AKfycbxXwJrURChRY6dW8i-XgMyPwlXexI6Oa4-CXulK_dNZ8rHvSD5kd0sUUKgRCiZkM8oI/exec";
+		
+    const submit_url = "<?!= service_url ?>";
+		const data_url = submit_url + "?view=data";
+		
+		let cart_items = [];
+		let setting_page = {};
+		let info_page = {};
+		
+		/*UIs*/
+		function close_detail(this_detail){
+			this_detail.open = false;
+		}
+		function close_dialog_detail(){
+			close_detail(document.querySelector(".my-dialog-detail[open]"));
+			close_backdrop();
+		}
+		function close_tabs(){
+			let this_elm = this;
+			let my_container = this_elm.parentElement.parentElement;
+			let my_detail = my_container.querySelectorAll(".my-detail[open]");
+			for(let i=0; i< my_detail.length; i++){
+				close_detail(my_detail[i]);
+			}
+		}
+		
+		function open_backdrop(){
+			document.getElementById("backdrop").classList.add("backdrop-show");
+		}
+		function close_backdrop(){
+			document.getElementById("backdrop").classList.remove("backdrop-show");
+		}
+		
+		function show_tooltip(this_btn, tooltip_text){
+			let this_tooltip = this_btn.querySelector(".order_tooltiptext");
+			this_tooltip.innerHTML = tooltip_text;
+			this_tooltip.classList.add("show");
+		}
+		
+		function hide_tooltip(){
+			let this_tooltip = this;
+			this_tooltip.classList.remove("show");
+		}
+		
+		/*utils*/
+		function rowsToObjects(headers, rows){
+		  return rows.reduce((acc, e, idx) =>  {
+			 acc.push(headers.reduce((r, h, i)=> {r[h] = ((e[i])?(e[i] + "").trim():""); return r; }, {}))
+			 return acc;
+		  }, []);
+		}
+		 
+		/*form submit*/
+		/*prepare and validate card*/
+		function prepareCardForm(this_card){
+			let prepared_card_obj = {};
+			let card_inputs = this_card.querySelectorAll("input,select");
+			for(let i=0; i<card_inputs.length; i++){
+				let card_input = card_inputs[i];
+				if(!card_input.checkValidity()){
+					card_input.reportValidity();
+					return false;
+				}
+				prepared_card_obj[card_input.name] = card_input.value;
+			}
+			return prepared_card_obj;
+		}
+
+		function changeItemSubtotal(this_item_quantity){
+			if(!(this_item_quantity && "quantity" == this_item_quantity.name)){
+				this_item_quantity = this;
+			}
+			
+			let this_card = this_item_quantity.parentElement.parentElement.parentElement;
+			let this_item_price = this_card.querySelector(".item_price");
+			this_card.querySelector(".item_subtotal").innerHTML = "$" + (Number(this_item_price.value) * Number(this_item_quantity.value));
+		}
+		function addQuantityBox(){
+			let this_q_box_btn = this;
+			let this_item_quantity = this_q_box_btn.parentElement.querySelector(".item_quantity");
+			this_item_quantity.value = Number(this_item_quantity.value) + Number(this_q_box_btn.dataset["q_box"]);
+			
+			changeItemSubtotal(this_item_quantity);
+		}
+		
+		function removeCartRow(){
+			let this_remove_btn = this;
+			let this_row = this_remove_btn.parentElement.parentElement;
+			
+			//remove from cart items
+			cart_items.splice(this_row.rowIndex-1, 1);
+			
+			//render cart
+			cartItemRender(cart_items);
+			
+			//recalculate
+			recalculateTotal();
+		}
+		
+		function saveRecord (){
+			let this_order_btn = this;
+			let this_card = this_order_btn.parentElement.parentElement.parentElement;
+			
+			//validate pre save
+			let prepared_card_obj = prepareCardForm(this_card);
+			if(prepared_card_obj){
+				//reset card
+				this_card.querySelectorAll("input.user_input,select.user_input").forEach( (this_input) => {
+					this_input.value = "";
+				})
+				this_card.querySelector(".item_subtotal").innerHTML = "";
+				console.log(prepared_card_obj);
+				
+				//push to cart items
+				cart_items.push(prepared_card_obj);
+				
+				//render cart
+				cartItemRender(cart_items);
+				
+				//recalculate
+				recalculateTotal();
+			}
+		}
+		/*old -> 20210526 updated
+		function recalculateTotal(){
+			let result_total = cart_items.reduce(function (accumulator, currentValue) {
+				return accumulator + (Number(currentValue['price']) * Number(currentValue['quantity']))
+			}, 0);
+			document.querySelector("#result_total").innerHTML = result_total;
+		}*/
+		function recalculateTotal(){
+			let result_total = cart_items.reduce((accumulator, {price, quantity}) => {
+				return accumulator + (Number(price) * Number(quantity))
+			}, 0);
+			document.querySelector("#result_total").innerHTML = result_total;
+		}
+		/*one line solution
+		function getSubtotalPerSupplier(){
+			let result_total = cart_items.reduce((accumulator, {supplier, price, quantity}) =>
+				(accumulator[supplier] = (accumulator[supplier] || 0)+ +(price * quantity), accumulator)
+			, {});
+			return result_total;
+		}
+		*/
+		function getSubtotalPerSupplier(){
+			let result_total = cart_items.reduce((accumulator, {supplier, price, quantity}) => {
+				accumulator[supplier] = (accumulator[supplier] || 0)+ +(price * quantity);
+				return accumulator;
+			}, {});
+			return result_total;
+		}
+		
+		function checkCustomValidity(this_form, this_submit_btn){
+			if(this_form.querySelector("#cart-form-container").rows.length <= 0){
+				this_submit_btn.setCustomValidity('Must submit at least one item!');
+				return false;
+			}else{
+				//custom subtotal per supplier -> form_minimal_order_by_supplier
+				if(setting_page['form_minimal_order_by_supplier']){
+					let suppliers_subtotal = getSubtotalPerSupplier();
+					let current_suppliers = Object.keys(suppliers_subtotal);
+					for(let i=0; i < current_suppliers.length; i++ ){
+						let supplier_limit = setting_page['form_minimal_order_by_supplier'][current_suppliers[i]];
+						if(supplier_limit){
+							let current_subtotal = suppliers_subtotal[current_suppliers[i]];
+							if(Number(supplier_limit) > current_subtotal){
+								this_submit_btn.setCustomValidity('This ' + current_suppliers[i] + ' items is not enough!\nCurrent: ' + current_subtotal + '\nMinimal: ' + supplier_limit);
+								return false;
+							}
+						}
+					}
+				}
+				
+				this_submit_btn.setCustomValidity('');
+				return true;
+			}
+		}
+		
+		async function submitHandler(e) {
+			e.preventDefault();
+			let this_submit_btn = this;
+			let this_form = this.parentElement.parentElement.parentElement.parentElement.parentElement;
+			
+			this_submit_btn.disabled = true;
+			
+			if(this_form.checkValidity() && checkCustomValidity(this_form, this_submit_btn)){
+				let form_data = new FormData(this_form);
+
+				//this.backdrop_is_show = true;
+				await fetch(submit_url, {
+					method: "POST",
+					body: form_data
+				})
+				.then(r => r.json())
+				.then(async data => {
+					//clear cart items
+					cart_items = [];
+					
+					//render cart
+					cartItemRender(cart_items);
+					
+					//recalculate
+					recalculateTotal();
+					
+					this_submit_btn.disabled = false;
+				});
+			}else{
+				this_submit_btn.disabled = false;
+				this_form.reportValidity();
+			}
+		}
+		
+		/*datas*/
+		async function firstUpdated() {
+			await fetch(data_url)
+			.then(r => r.json())
+			.then(async datas => {
+				prepareValues(datas);
+				
+				await fetch(info_url + "?get_data_sheet=_setting_branches,_setting_links")
+				.then(r => r.json())
+				.then(async info_datas => {
+					info_page = info_datas.data;
+					if(info_page['_setting_branches']){
+						branchOptionRender(info_page['_setting_branches']);
+					}
+					if(info_page['_setting_links']){
+						relatedLinkRender(info_page['_setting_links']);
+					}
+				});
+			});
+		}
+		function prepareValues(raw_datas){
+			//change into array_object_with_key
+			let keyed_datas = rowsToObjects(raw_datas.data[0], raw_datas.data.splice(1));
+			
+			setting_page = (raw_datas.setting ? raw_datas.setting : {});
+			
+			console.log(setting_page);
+			
+			//group by 類別
+			let grouped_datas = {};
+			for(let i=0; i<keyed_datas.length; i++){
+				let keyed_data = keyed_datas[i];
+				if(!keyed_data['類別']){
+					continue;
+				}else if(!grouped_datas[keyed_data['類別']]){
+					grouped_datas[keyed_data['類別']] = [];
+				}
+				grouped_datas[keyed_data['類別']].push(keyed_data);
+			}
+			
+			mainRender(grouped_datas);
+		}
+		
+		/*DOM Render*/
+		function relatedLinkRender(prepared_datas){
+			let relatedLinksTemplate = (link_datas) => html`
+				${link_datas.map((link_data) => html`
+					<a class="related_link" href="${link_data['value']}" target="_blank">${link_data['key']}</a>
+				`)}
+			`;
+			
+			const result = relatedLinksTemplate(prepared_datas);
+			render(result, document.querySelector("#related_link"));
+		}
+		
+		function branchOptionRender(prepared_datas){
+			let branchOptionsTemplate = (branch_datas) => html`
+				${branch_datas.map((branch_data) => html`
+					<option value="${branch_data['value']}">${branch_data['key']}</option>
+				`)}
+			`;
+			
+			const result = branchOptionsTemplate(prepared_datas);
+			render(result, document.querySelector("#cart-form-branch"));
+		}
+		
+		function cartItemRender(prepared_datas){
+			let cartItemsTemplate = (cart_datas) => html`
+				${cart_datas.map((cart_data) => html`
+					<tr class="card-form-row">
+						<td>
+							<input type="hidden" name="barcode" value="${cart_data['barcode']}">
+							<input type="hidden" name="supplier" value="${cart_data['supplier']}">
+							<input type="hidden" name="category" value="${cart_data['category']}">
+							<input type="hidden" name="name" value="${cart_data['name']}">
+							<input type="hidden" name="variant" value="${cart_data['variant']}">
+							<input type="hidden" name="code" value="${cart_data['code']}">
+							<input type="hidden" name="quantity" value="${cart_data['quantity']}">
+							<input type="hidden" name="price" value="${cart_data['price']}">
+							<input type="button" value="X" @click="${removeCartRow}">
+						</td>
+						<td class="card-form-item">
+							${cart_data['barcode']}
+						</td>
+						<td class="card-form-item">
+							${cart_data['name']}
+						</td>
+						<!--td class="card-form-item">
+							${cart_data['variant']}
+						</td-->
+						<td class="card-form-item">
+							${cart_data['supplier']}
+						</td>
+						<td class="card-form-item">
+							${cart_data['quantity']}
+						</td>
+						<td class="card-form-item">
+							${cart_data['price']}
+						</td>
+						<td class="card-form-item result_subtotal" data-subtotal="${Number(cart_data['price']) * Number(cart_data['quantity'])}"></td>
+					</tr>
+				`)}
+			`;
+			
+			const result = cartItemsTemplate(prepared_datas);
+			render(result, document.querySelector("#cart-form-container"));
+		}
+		
+		function mainRender(prepared_datas){
+			console.log(prepared_datas);
+			let mainTemplate = (datas) => html`
+				<div id="main-container" class="flex-container">
+					<details class="my-dialog-detail">
+						<summary id="cart-btn" class="my-tab" @click="${open_backdrop}">Cek Total Pesanan</summary>
+						<div id="my-cart-dialog" class="my-dialog">
+							<form id="cart-form">
+								購物車清單Pesanan
+								<div>
+									Customer ID 
+									<select id="cart-form-branch" name="branch" required>
+									</select>
+								</div>
+								<table>
+									<thead>
+										<th></th>
+										<th>條碼Barcode</th>
+										<th>品名Nama barang</th>
+										<!--th>種類Varian</th-->
+										<th>廠商Supplier</th>
+										<!--th>Warna</th>
+										<th>Pesanan</th-->
+										<th>數量Jumlah</th>
+										<th>單價Harga</th>
+										<th>金額Subtotal</th>
+									</thead>
+									
+									<tbody id="cart-form-container">
+									</tbody>
+									
+									<tr class="result_row">
+										<th colspan="6">總金額Total</th>
+										<th id="result_total"></th>
+									</tr>
+									<tr>
+										<th colspan="4">備註Note<textarea name="note"></textarea></th>
+										<th colspan="2">
+											<button id="cart-submit-btn" @click="${submitHandler}">
+												Pesan sekarang
+												<span class="order_tooltiptext" @animationend="${hide_tooltip}"></span>
+											</button>
+										</th>
+									</tr>
+								</table>
+							</form>
+						</div>
+					</details>
+					${Object.keys(datas).map((header) => html`
+						<details class="my-detail">
+							<summary class="my-tab" @click="${close_tabs}">${header}</summary>
+								<div class="card-container">
+									<!--label class="my-tab-desc">
+									</label-->
+									${datas[header].map((data) => html`
+										<div class="card">
+											<h3 class="card_title">
+												${data['中文品名']}
+												<div class="multi-line">${data["其他品名"]}</div>
+											</h3>
+											<div class="card_visual">
+												<img src="${data['圖片']}">
+											</div>
+											<div class="card_detail">
+												<span><em>${data['條碼']}</em></span>
+												<span>規格: <strong> ${data['容量']}*${data['箱入數']}入/箱</strong></span>
+												<span>單價: <strong>${data['PCS']}</strong></span>
+												<div class="card_detail_trans">
+													<input name="category" type="hidden" value="${data['類別']}">
+													<input name="barcode" type="hidden" value="${data['條碼']}">
+													<input name="supplier" type="hidden" value="${data['供應商']}">
+													<input name="name" type="hidden" value="${data['中文品名']}">
+													<input name="code" type="hidden" value="${data['CODE']}">
+													<input name="price" class="item_price" type="hidden" value="${data['PCS']}">
+													<input name="quantity" placeholder="Jumlah" class="item_quantity user_input" type="number" min="${data['最低數量']}" required @change="${changeItemSubtotal}">
+													<span class="item_subtotal"></span>
+													${(data['種類'] ? html`
+														<select name="variant" class="item_variant user_input" required>
+														<option value="">!Select...</option>
+														${data['種類'].split("\n").map((data_variant) => html`
+															<option value="${data_variant}">${data_variant}</option>
+														`)}
+														</select>
+													`: html``)}
+													<button data-q_box="${data['箱入數']}" @click="${addQuantityBox}">+1箱</button>
+													<button class="order_button" @click="${saveRecord}" data-min_order="${data['最低數量']}">
+														加入購物車Pesan
+														<span class="order_tooltiptext" @animationend="${hide_tooltip}"></span>
+													</button>
+												</div>
+											</div>
+											<details class="my-dialog-detail">
+												<summary class="my-dialog-btn" @click="${open_backdrop}">Detail</summary>
+												<div class="my-dialog card_dialog_detail">
+													<img src="${data['圖片']}">
+												</div>
+											</details>
+										</div>
+									`)}
+								</div>
+						</details>
+					`)}
+				</div>
+				<div id="backdrop" @click="${close_dialog_detail}">
+				</div>
+			`;
+			
+			const result = mainTemplate(prepared_datas);
+			render(result, document.querySelector("#main-body"));
+		}
+		
+		window.addEventListener('load', firstUpdated);
+	</script>
+</html>
